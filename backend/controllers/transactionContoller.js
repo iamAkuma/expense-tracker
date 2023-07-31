@@ -19,5 +19,5 @@ exports.addTransactions = (req, res, next) => {
 // Public
 
 exports.deleteTransactions = (req, res, next) => {
-    res.send('GET transactions')
+    res.send('DELETE transactions')
 }

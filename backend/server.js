@@ -2,14 +2,20 @@ const express = require('express');
 const dotenv = require('dotenv');
 const colors = require('colors');
 const morgan = require('morgan');
+const path = require('path'); // Import the path module
+const connectDB = require('../config/db');
 
-dotenv.config({ path: './config/config.env' });
+// Get the absolute path to the config file
+const configPath = path.join(__dirname, '../config/config.env');
+dotenv.config({ path: configPath });
+
+connectDB();
 
 const transactions = require('./routes/transactions');
 
 const app = express();
 
-app.use('/api/v1/transactions', transactions)
+app.use('/api/v1/transactions', transactions);
 
 const PORT = process.env.PORT || 5000;
 
