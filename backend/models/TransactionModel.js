@@ -9,7 +9,7 @@ const TransactionSchema = new mongoose.Schema({
 
     amount: {
         type: Number,
-        required: [ true, 'Please add a +ve or -ve number']
+        required: [true, 'Please add a positive or negative number']
     },
 
     createdAt: {
