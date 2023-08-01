@@ -12,7 +12,7 @@ const TransactionSchema = new mongoose.Schema({
         required: [ true, 'Please add a +ve or -ve number']
     },
 
-    createdAr: {
+    createdAt: {
         type: Date,
         default: Date.now
     }
