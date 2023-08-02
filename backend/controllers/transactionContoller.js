@@ -1,61 +1,80 @@
-const Transaction = require('../models/TransactionModel')
+const Transaction = require('../models/TransactionModel');
 
-// Get all transactions
-// GET /api/v1/transactions
-// Public
+// @desc    Get all transactions
+// @route   GET /api/v1/transactions
+// @access  Public
 exports.getTransactions = async (req, res, next) => {
-    try {
-        const options = { maxTimeMS: 20000 }; // Increase timeout to 20000 milliseconds (20 seconds)
-        const transactions = await Transaction.find({}, null, options);
+  try {
+    const transactions = await Transaction.find();
 
-
-        if (transactions.length === 0) {
-            // If no transactions are found, return an empty array
-            return res.status(200).json({
-                success: true,
-                count: 0,
-                data: [],
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            count: transactions.length,
-            data: transactions,
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            error: 'Server Error',
-        });
-    }
-};
-
-// Add transactions
-// POST /api/v1/transactions
-// Public
-exports.addTransactions = async (req, res, next) => {
-
-    try {
-        const { text, amount } = req.body;
-
-        const transaction = await Transaction.create(req.body)
-
-        return res.send(201).json({
-            success: true,
-            data: transaction
-        })
-    } catch (error) {
-        console.error(error);
-
-    }
-
+    return res.status(200).json({
+      success: true,
+      count: transactions.length,
+      data: transactions
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error'
+    });
+  }
 }
 
-// Delete transactions
-// DELETE /api/v1/transactions/:id
-// Public
+// @desc    Add transaction
+// @route   POST /api/v1/transactions
+// @access  Public
+exports.addTransactions = async (req, res, next) => {
+  try {
+    const { text, amount } = req.body;
+
+    const transaction = await Transaction.create(req.body);
+  
+    return res.status(201).json({
+      success: true,
+      data: transaction
+    }); 
+  } catch (err) {
+    if(err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+
+      return res.status(400).json({
+        success: false,
+        error: messages
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        error: 'Server Error'
+      });
+    }
+  }
+}
+
+// @desc    Delete transaction
+// @route   DELETE /api/v1/transactions/:id
+// @access  Public
 exports.deleteTransactions = async (req, res, next) => {
-    res.send('DELETE transactions')
+  try {
+    const transaction = await Transaction.findById(req.params.id);
+
+    if(!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'No transaction found'
+      });
+    }
+
+    await transaction.remove();
+
+    return res.status(200).json({
+      success: true,
+      data: {}
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error'
+    });
+  }
 }
